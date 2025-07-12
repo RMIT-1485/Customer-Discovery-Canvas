@@ -1,107 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
   <title>Customer Discovery Canvas</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.3.1/docx.umd.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 40px;
-      background-color: #ffffff;
-      color: #333;
+      margin: 40px;
+      background: #f9f9f9;
     }
     h1 {
       color: #ba372a;
-      margin-bottom: 10px;
     }
-    h2 {
-      color: #ba372a;
-      margin-top: 40px;
-    }
-    .section {
-      margin-bottom: 30px;
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 14px;
     }
     label {
       font-weight: bold;
+      margin-top: 20px;
       display: block;
-      margin-bottom: 6px;
-    }
-    textarea, input[type="text"] {
-      width: 100%;
-      min-height: 100px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 14px;
-      resize: vertical;
+      color: #333;
     }
     button {
-      background-color: #ba372a;
-      color: #fff;
-      padding: 12px 24px;
+      background: #ba372a;
+      color: white;
+      padding: 12px 20px;
+      font-size: 16px;
       border: none;
       border-radius: 5px;
-      font-size: 16px;
       cursor: pointer;
     }
     button:hover {
-      background-color: #a52a1e;
-    }
-    .instructions {
-      background-color: #f6f6f6;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 30px;
+      background: #a02e1f;
     }
   </style>
 </head>
 <body>
   <h1>Customer Discovery Canvas</h1>
-  <div class="instructions">
-    <p>Use this interactive canvas to capture your customer discovery insights. Once completed, you can print or save your work using the button at the bottom.</p>
-  </div>
 
-  <div class="section">
-    <label for="segment">1. Customer Segment</label>
-    <textarea id="segment" placeholder="Who is your customer? What defines this group?"></textarea>
-  </div>
+  <label for="problem">1. Problem Identification</label>
+  <textarea id="problem"></textarea>
 
-  <div class="section">
-    <label for="problem">2. Problem Statement / Job to be Done</label>
-    <textarea id="problem" placeholder="What is the customer trying to achieve or solve?"></textarea>
-  </div>
+  <label for="context">2. Customer Context Understanding</label>
+  <textarea id="context"></textarea>
 
-  <div class="section">
-    <label for="behaviours">3. Current Behaviours</label>
-    <textarea id="behaviours" placeholder="What are customers currently doing to solve this?"></textarea>
-  </div>
+  <label for="emotions">3. Emotional Journey Mapping</label>
+  <textarea id="emotions"></textarea>
 
-  <div class="section">
-    <label for="motivations">4. Motivations and Triggers</label>
-    <textarea id="motivations" placeholder="What drives customers to act?"></textarea>
-  </div>
+  <label for="behaviours">4. Behavioural Pattern Analysis</label>
+  <textarea id="behaviours"></textarea>
 
-  <div class="section">
-    <label for="pains">5. Pains / Frustrations</label>
-    <textarea id="pains" placeholder="What’s difficult or frustrating in the experience?"></textarea>
-  </div>
+  <label for="needs">5. Need Validation and Prioritisation</label>
+  <textarea id="needs"></textarea>
 
-  <div class="section">
-    <label for="gains">6. Gains / Success Criteria</label>
-    <textarea id="gains" placeholder="How do customers define success or value?"></textarea>
-  </div>
+  <button onclick="exportToWord()">Export to Word</button>
 
-  <div class="section">
-    <label for="insights">7. Insights from Discovery</label>
-    <textarea id="insights" placeholder="What patterns, quotes or unexpected findings emerged?"></textarea>
-  </div>
+  <script>
+    async function exportToWord() {
+      const { Document, Packer, Paragraph, TextRun } = docx;
 
-  <div class="section">
-    <label for="assumptions">8. Assumptions to Test</label>
-    <textarea id="assumptions" placeholder="What assumptions do you still need to validate?"></textarea>
-  </div>
+      const inputs = {
+        "1. Problem Identification": document.getElementById("problem").value,
+        "2. Customer Context Understanding": document.getElementById("context").value,
+        "3. Emotional Journey Mapping": document.getElementById("emotions").value,
+        "4. Behavioural Pattern Analysis": document.getElementById("behaviours").value,
+        "5. Need Validation and Prioritisation": document.getElementById("needs").value
+      };
 
-  <button onclick="window.print()">Print or Save Your Canvas</button>
+      const doc = new Document({
+        sections: [{
+          properties: {},
+          children: Object.entries(inputs).flatMap(([heading, value]) => [
+            new Paragraph({ children: [new TextRun({ text: heading, bold: true, size: 28 })] }),
+            new Paragraph({ text: value || "[No input provided]", spacing: { after: 200 } })
+          ])
+        }]
+      });
+
+      const blob = await Packer.toBlob(doc);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Customer_Discovery_Canvas.docx";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
 </body>
 </html>
